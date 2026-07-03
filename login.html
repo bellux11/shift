@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - SHIFT Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js");
+        }
+    </script>
+</head>
+
+<body class="login-page">
+
+    <div class="login-container">
+
+        <img src="assets/logo-shift.png" alt="SHIFT Manager" class="logo-shift">
+
+        <h2 class="login-title">Accedi alla tua area riservata</h2>
+
+        <form id="loginForm" class="login-form">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Inserisci la tua email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Inserisci la password" required>
+
+            <button type="submit" class="login-button">Accedi</button>
+        </form>
+
+        <p class="login-note">Accesso riservato a titolari e dipendenti autorizzati.</p>
+    </div>
+
+    <script>
+        // Database utenti (simulato - in produzione usare backend)
+        const users = [
+            { email: "admin@shift.com", password: "1234", role: "manager", name: "Admin" },
+            { email: "mario@shift.com", password: "1234", role: "lavoratore", name: "Mario Rossi" },
+            { email: "luca@shift.com", password: "1234", role: "lavoratore", name: "Luca Bianchi" },
+            { email: "anna@shift.com", password: "1234", role: "lavoratore", name: "Anna Verdi" }
+        ];
+
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let email = document.getElementById("email").value.trim();
+            let password = document.getElementById("password").value;
+
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                // Salva sessione utente
+                localStorage.setItem("shift_user", JSON.stringify({
+                    email: user.email,
+                    role: user.role,
+                    name: user.name,
+                    loggedIn: true
+                }));
+
+                // Redirect in base al ruolo
+                if (user.role === "manager") {
+                    window.location.href = "manager/index.html";
+                } else {
+                    window.location.href = "users/index.html";
+                }
+            } else {
+                alert("Credenziali non valide");
+            }
+        });
+    </script>
+
+</body>
+</html>

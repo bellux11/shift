@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profilo Lavoratore – SHIFT Manager</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .profilo-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 30px;
+      padding: 24px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .profilo-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+    .profilo-info h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1e2a3a;
+      margin: 0 0 8px 0;
+    }
+    .profilo-info .ruolo {
+      font-size: 1.1rem;
+      color: #6b7280;
+      margin: 0 0 12px 0;
+    }
+    .profilo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+    }
+    .badge-premium { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+    .badge-elite { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+    .badge-professional { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+    .badge-starter { background: #9ca3af; }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .score-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .score-panel h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f3f4f6;
+    }
+
+    .score-big {
+      text-align: center;
+      padding: 20px;
+    }
+    .score-number {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .score-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f59e0b;
+      margin-top: 8px;
+    }
+    .score-descrizione {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    .componente-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .componente-info {
+      flex: 1;
+    }
+    .componente-info h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0 0 4px 0;
+    }
+    .componente-info p {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin: 0;
+    }
+    .componente-valore {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      min-width: 50px;
+      text-align: right;
+    }
+    .barra-container {
+      width: 100%;
+      height: 8px;
+      background: #f3f4f6;
+      border-radius: 4px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .barra-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+    .barra-affidabilita { background: linear-gradient(90deg, #10b981, #059669); }
+    .barra-esperienza { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+    .barra-feedback { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+    .barra-continuita { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    .barra-badge { background: linear-gradient(90deg, #ec4899, #db2777); }
+    .barra-disponibilita { background: linear-gradient(90deg, #06b6d4, #0891b2); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-numero {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1e2a3a;
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .penalita-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .penalita-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border-radius: 8px;
+      border-left: 4px solid #ef4444;
+    }
+    .penalita-item span:first-child {
+      font-size: 0.9rem;
+      color: #374151;
+    }
+    .penalita-item span:last-child {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #dc2626;
+    }
+    .nessuna-penalita {
+      text-align: center;
+      padding: 20px;
+      color: #059669;
+      font-size: 1rem;
+    }
+
+    .badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .badge-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .badge-item.verificato {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .feedback-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .feedback-item:last-child { border-bottom: none; }
+    .feedback-label { font-size: 0.9rem; color: #374151; }
+    .feedback-stars { color: #fbbf24; font-size: 1rem; }
+
+    .turno-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .turno-info h4 { font-size: 0.95rem; font-weight: 600; color: #1e2a3a; margin: 0; }
+    .turno-info p { font-size: 0.8rem; color: #6b7280; margin: 2px 0 0 0; }
+    .turno-stato {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .stato-completato { background: #d1fae5; color: #065f46; }
+    .stato-cancellato { background: #fee2e2; color: #991b1b; }
+
+    .btn-indietro {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3f4f6;
+      color: #374151;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+    .btn-indietro:hover { background: #e5e7eb; }
+
+    @media (max-width: 768px) {
+      .score-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .profilo-header { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../assets/logo.png" alt="SHIFT Manager" width="48" height="48" style="border-radius: 12px;" />
+      <h2>SHIFT Manager</h2>
+    </div>
+    <nav class="nav">
+      <a href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="lavoratori.html" class="active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Lavoratori
+      </a>
+      <a href="proposte.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        Proposte
+      </a>
+      <a href="candidature.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Candidature
+      </a>
+      <a href="comunicazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Comunicazioni
+      </a>
+      <a href="impostazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Impostazioni
+      </a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <h1>Profilo Lavoratore</h1>
+      <div class="user-menu">
+        <span class="username">Mirko</span>
+        <svg width="32" height="32" viewBox="0 0 32 32" style="border-radius:50%">
+          <circle cx="16" cy="16" r="16" fill="#3b82f6"/>
+          <text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-weight="bold">M</text>
+        </svg>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <button class="btn-indietro" onclick="history.back()">← Torna ai lavoratori</button>
+
+      <div class="profilo-header" id="profiloHeader">
+        <div class="profilo-avatar" id="profiloAvatar">MR</div>
+        <div class="profilo-info">
+          <h1 id="profiloNome">Mario Rossi</h1>
+          <p class="ruolo" id="profiloRuolo">Aiuto cuoco • Roma, Trastevere</p>
+          <span class="profilo-badge badge-premium" id="profiloBadge">⭐ Premium</span>
+        </div>
+      </div>
+
+      <div class="score-grid">
+
+        <div class="score-panel">
+          <h2>🎯 Shift Score</h2>
+          <div class="score-big">
+            <div class="score-number" id="scoreNumero">92</div>
+            <div class="score-label" id="scoreLivello">Premium</div>
+            <div class="score-descrizione">Top performer • Affidabilità eccellente</div>
+          </div>
+          <div class="stats-grid" style="margin-top: 20px;">
+            <div class="stat-card">
+              <span class="stat-numero" id="statTurni">12</span>
+              <span class="stat-label">Turni con te</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero" id="statCompletati">98</span>
+              <span class="stat-label">% Completati</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero" id="statAnni">3</span>
+              <span class="stat-label">Anni esperienza</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <h2>📊 Componenti del punteggio</h2>
+
+          <div class="componente-row">
+            <div class="componente-info">
+              <h4>Affidabilità operativa (45%)</h4>
+              <p>Turni completati vs accettati</p>
+              <div class="barra-container">
+                <div class="barra-fill barra-affidabilita" style="width: 98%"></div>
+              </div>
+            </div>
+            <span class="componente-valore">98/100</span>
+          </div>
+
+          <div class="componente-row">
+            <div class="componente-info">
+              <h4>Esperienza nel ruolo (15%)</h4>
+              <p>500 ore lavorate</p>
+              <div class="barra-container">
+                <div class="barra-fill barra-esperienza" style="width: 85%"></div>
+              </div>
+            </div>
+            <span class="componente-valore">85/100</span>
+          </div>
+
+          <div class="componente-row">
+            <div class="componente-info">
+              <h4>Feedback aziende (15%)</h4>
+              <p>Media 4.8/5 su 12 valutazioni</p>
+              <div class="barra-container">
+                <div class="barra-fill barra-feedback" style="width: 96%"></div>
+              </div>
+            </div>
+            <span class="componente-valore">96/100</span>
+          </div>
+
+          <div class="componente-row">
+            <div class="componente-info">
+              <h4>Continuità lavorativa (10%)</h4>
+              <p>8 turni negli ultimi 30 giorni</p>
+              <div class="barra-container">
+                <div class="barra-fill barra-continuita" style="width: 90%"></div>
+              </div>
+            </div>
+            <span class="componente-valore">90/100</span>
+          </div>
+
+          <div class="componente-row">
+            <div class="componente-info">
+              <h4>Badge professionali (5%)</h4>
+              <p>3 certificazioni verificate</p>
+              <div class="barra-container">
+                <div class="barra-fill barra-badge" style="width: 75%"></div>
+              </div>
+            </div>
+            <span class="componente-valore">75/100</span>
+          </div>
+
+          <div class="componente-row">
+            <div class="componente-info">
+              <h4>Disponibilità certificata (5%)</h4>
+              <p>Risposta media: 15 min</p>
+              <div class="barra-container">
+                <div class="barra-fill barra-disponibilita" style="width: 92%"></div>
+              </div>
+            </div>
+            <span class="componente-valore">92/100</span>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <h2>📈 Statistiche</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-numero">128</span>
+              <span class="stat-label">Turni accettati</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero">125</span>
+              <span class="stat-label">Turni completati</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero">2</span>
+              <span class="stat-label">Cancellazioni</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero">1</span>
+              <span class="stat-label">No-show</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero">0</span>
+              <span class="stat-label">Ritardi gravi</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-numero">500+</span>
+              <span class="stat-label">Ore lavorate</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <h2>⚠️ Penalità</h2>
+          <div class="penalita-list" id="penalitaList">
+            <div class="penalita-item">
+              <span>No-show (15 Mar 2026)</span>
+              <span>-10 punti</span>
+            </div>
+            <div class="penalita-item">
+              <span>Cancellazione <24h (2 Feb 2026)</span>
+              <span>-5 punti</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <h2>🏅 Badge professionali</h2>
+          <div class="badge-list">
+            <span class="badge-item verificato">✓ HACCP</span>
+            <span class="badge-item verificato">✓ Sicurezza alimentare</span>
+            <span class="badge-item">Cucina italiana</span>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <h2>💬 Feedback strutturato</h2>
+          <div class="feedback-item">
+            <span class="feedback-label">Professionalità</span>
+            <span class="feedback-stars">⭐⭐⭐⭐⭐</span>
+          </div>
+          <div class="feedback-item">
+            <span class="feedback-label">Puntualità</span>
+            <span class="feedback-stars">⭐⭐⭐⭐⭐</span>
+          </div>
+          <div class="feedback-item">
+            <span class="feedback-label">Educazione</span>
+            <span class="feedback-stars">⭐⭐⭐⭐⭐</span>
+          </div>
+          <div class="feedback-item">
+            <span class="feedback-label">Team working</span>
+            <span class="feedback-stars">⭐⭐⭐⭐☆</span>
+          </div>
+          <div class="feedback-item">
+            <span class="feedback-label">Cura del cliente</span>
+            <span class="feedback-stars">⭐⭐⭐⭐⭐</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="score-panel" style="margin-top: 20px;">
+        <h2>📅 Storia turni con te</h2>
+        <div class="turno-row">
+          <div class="turno-info">
+            <h4>Aiuto cuoco</h4>
+            <p>18 Apr 2026 • 10:00-15:00 • Osteria da Gino</p>
+          </div>
+          <span class="turno-stato stato-completato">✓ Completato</span>
+        </div>
+        <div class="turno-row">
+          <div class="turno-info">
+            <h4>Aiuto cuoco</h4>
+            <p>12 Apr 2026 • 10:00-15:00 • Osteria da Gino</p>
+          </div>
+          <span class="turno-stato stato-completato">✓ Completato</span>
+        </div>
+        <div class="turno-row">
+          <div class="turno-info">
+            <h4>Aiuto cuoco</h4>
+            <p>5 Apr 2026 • 10:00-15:00 • Osteria da Gino</p>
+          </div>
+          <span class="turno-stato stato-completato">✓ Completato</span>
+        </div>
+        <div class="turno-row">
+          <div class="turno-info">
+            <h4>Aiuto cuoco</h4>
+            <p>15 Mar 2026 • 10:00-15:00 • Osteria da Gino</p>
+          </div>
+          <span class="turno-stato stato-cancellato">✕ No-show</span>
+        </div>
+      </div>
+
+    </section>
+    <footer class="footer">SHIFT Manager © 2026</footer>
+  </div>
+
+  <script>
+    const lavoratoriDB = {
+      'mario-rossi': {
+        nome: 'Mario Rossi', avatar: 'MR', ruolo: 'Aiuto cuoco', location: 'Roma, Trastevere',
+        score: 92, livello: 'Premium', badgeClass: 'badge-premium',
+        turniConTe: 12, completati: 98, anni: 3,
+        turniAccettati: 128, turniCompletati: 125, cancellazioni: 2, noshow: 1, ritardi: 0, ore: 500,
+        componenti: { affidabilita: 98, esperienza: 85, feedback: 96, continuita: 90, badge: 75, disponibilita: 92 },
+        penalita: [
+          { tipo: 'No-show', data: '15 Mar 2026', punti: -10 },
+          { tipo: 'Cancellazione <24h', data: '2 Feb 2026', punti: -5 }
+        ],
+        badge: [
+          { nome: 'HACCP', verificato: true },
+          { nome: 'Sicurezza alimentare', verificato: true },
+          { nome: 'Cucina italiana', verificato: false }
+        ],
+        feedback: { professionalita: 5, puntualita: 5, educazione: 5, team: 4, cura: 5 },
+        storia: [
+          { ruolo: 'Aiuto cuoco', data: '18 Apr 2026', orario: '10:00-15:00', luogo: 'Osteria da Gino', stato: 'completato' },
+          { ruolo: 'Aiuto cuoco', data: '12 Apr 2026', orario: '10:00-15:00', luogo: 'Osteria da Gino', stato: 'completato' },
+          { ruolo: 'Aiuto cuoco', data: '5 Apr 2026', orario: '10:00-15:00', luogo: 'Osteria da Gino', stato: 'completato' },
+          { ruolo: 'Aiuto cuoco', data: '15 Mar 2026', orario: '10:00-15:00', luogo: 'Osteria da Gino', stato: 'noshow' }
+        ]
+      },
+      'luca-ferrini': {
+        nome: 'Luca Ferrini', avatar: 'LF', ruolo: 'Cuoco', location: 'Roma, Centro',
+        score: 88, livello: 'Elite', badgeClass: 'badge-elite',
+        turniConTe: 5, completati: 95, anni: 5,
+        turniAccettati: 80, turniCompletati: 76, cancellazioni: 3, noshow: 1, ritardi: 0, ore: 800,
+        componenti: { affidabilita: 95, esperienza: 92, feedback: 90, continuita: 85, badge: 80, disponibilita: 88 },
+        penalita: [
+          { tipo: 'No-show', data: '10 Gen 2026', punti: -10 }
+        ],
+        badge: [
+          { nome: 'HACCP', verificato: true },
+          { nome: 'Sommelier', verificato: true },
+          { nome: 'Cucina molecolare', verificato: false }
+        ],
+        feedback: { professionalita: 5, puntualita: 4, educazione: 5, team: 5, cura: 4 },
+        storia: [
+          { ruolo: 'Cuoco', data: '10 Apr 2026', orario: '18:00-23:00', luogo: 'Osteria da Gino', stato: 'completato' },
+          { ruolo: 'Cuoco', data: '3 Apr 2026', orario: '18:00-23:00', luogo: 'Osteria da Gino', stato: 'completato' }
+        ]
+      },
+      'sara-bianchi': {
+        nome: 'Sara Bianchi', avatar: 'SB', ruolo: 'Pizzaiola', location: 'Roma, Testaccio',
+        score: 95, livello: 'Premium', badgeClass: 'badge-premium',
+        turniConTe: 8, completati: 100, anni: 7,
+        turniAccettati: 200, turniCompletati: 200, cancellazioni: 0, noshow: 0, ritardi: 0, ore: 1200,
+        componenti: { affidabilita: 100, esperienza: 95, feedback: 98, continuita: 95, badge: 90, disponibilita: 96 },
+        penalita: [],
+        badge: [
+          { nome: 'HACCP', verificato: true },
+          { nome: 'Pizza napoletana STG', verificato: true },
+          { nome: 'Lievitazione naturale', verificato: true }
+        ],
+        feedback: { professionalita: 5, puntualita: 5, educazione: 5, team: 5, cura: 5 },
+        storia: [
+          { ruolo: 'Pizzaiola', data: '20 Apr 2026', orario: '18:00-23:00', luogo: 'Pizzeria Da Franco', stato: 'completato' },
+          { ruolo: 'Pizzaiola', data: '13 Apr 2026', orario: '18:00-23:00', luogo: 'Pizzeria Da Franco', stato: 'completato' }
+        ]
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id') || 'mario-rossi';
+      const dati = lavoratoriDB[id] || lavoratoriDB['mario-rossi'];
+
+      document.getElementById('profiloAvatar').textContent = dati.avatar;
+      document.getElementById('profiloNome').textContent = dati.nome;
+      document.getElementById('profiloRuolo').textContent = dati.ruolo + ' • ' + dati.location;
+      document.getElementById('profiloBadge').textContent = (dati.score >= 90 ? '⭐ ' : '🟣 ') + dati.livello;
+      document.getElementById('profiloBadge').className = 'profilo-badge ' + dati.badgeClass;
+      document.getElementById('scoreNumero').textContent = dati.score;
+      document.getElementById('scoreLivello').textContent = dati.livello;
+      document.getElementById('statTurni').textContent = dati.turniConTe;
+      document.getElementById('statCompletati').textContent = dati.completati;
+      document.getElementById('statAnni').textContent = dati.anni;
+
+      const comp = dati.componenti;
+      const barre = document.querySelectorAll('.barra-fill');
+      if (barre[0]) barre[0].style.width = comp.affidabilita + '%';
+      if (barre[1]) barre[1].style.width = comp.esperienza + '%';
+      if (barre[2]) barre[2].style.width = comp.feedback + '%';
+      if (barre[3]) barre[3].style.width = comp.continuita + '%';
+      if (barre[4]) barre[4].style.width = comp.badge + '%';
+      if (barre[5]) barre[5].style.width = comp.disponibilita + '%';
+
+      const valori = document.querySelectorAll('.componente-valore');
+      if (valori[0]) valori[0].textContent = comp.affidabilita + '/100';
+      if (valori[1]) valori[1].textContent = comp.esperienza + '/100';
+      if (valori[2]) valori[2].textContent = comp.feedback + '/100';
+      if (valori[3]) valori[3].textContent = comp.continuita + '/100';
+      if (valori[4]) valori[4].textContent = comp.badge + '/100';
+      if (valori[5]) valori[5].textContent = comp.disponibilita + '/100';
+
+      const penalitaList = document.getElementById('penalitaList');
+      if (dati.penalita.length === 0) {
+        penalitaList.innerHTML = '<div class="nessuna-penalita">✓ Nessuna penalità registrata</div>';
+      } else {
+        penalitaList.innerHTML = dati.penalita.map(p => 
+          '<div class="penalita-item"><span>' + p.tipo + ' (' + p.data + ')</span><span>' + p.punti + ' punti</span></div>'
+        ).join('');
+      }
+    });
+  </script>
+
+</body>
+</html>

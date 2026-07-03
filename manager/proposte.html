@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposte di lavoro – SHIFT Manager</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .section-title-group h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0;
+    }
+    .section-title-group p {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin: 4px 0 0 0;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.45);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-mini {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #f3f4f6;
+    }
+    .stat-mini-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .stat-mini-icon.blue { background: #dbeafe; }
+    .stat-mini-icon.green { background: #d1fae5; }
+    .stat-mini-icon.purple { background: #ede9fe; }
+    .stat-mini-icon.orange { background: #fef3c7; }
+    .stat-mini-info h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0;
+    }
+    .stat-mini-info p {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin: 2px 0 0 0;
+    }
+
+    .filtri-wrapper {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filtro-pill {
+      padding: 8px 18px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 50px;
+      background: white;
+      color: #6b7280;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filtro-pill:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+    .filtro-pill.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    .filtro-count {
+      background: rgba(255,255,255,0.25);
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .filtro-pill.active .filtro-count {
+      background: rgba(255,255,255,0.3);
+      color: white;
+    }
+    .filtro-pill:not(.active) .filtro-count {
+      background: #f3f4f6;
+      color: #9ca3af;
+    }
+
+    .proposte-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .proposta-card {
+      background: white;
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: all 0.35s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+    }
+    .proposta-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      border-color: #dbeafe;
+    }
+
+    .card-header {
+      padding: 20px 24px 16px;
+      position: relative;
+    }
+    .card-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
+    .card-header.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .card-header.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .card-header.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .card-header.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    .card-ruolo-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .card-ruolo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-ruolo .emoji { font-size: 2rem; }
+    .card-ruolo h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0;
+    }
+    .card-ruolo p {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin: 2px 0 0 0;
+    }
+
+    .card-stato {
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .stato-attiva { background: #dbeafe; color: #1e40af; }
+    .stato-completata { background: #d1fae5; color: #065f46; }
+    .stato-scaduta { background: #fee2e2; color: #991b1b; }
+
+    .card-dettagli {
+      padding: 0 24px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .dettaglio-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #4b5563;
+    }
+
+    .card-candidature {
+      padding: 16px 24px;
+      background: #f8fafc;
+      border-top: 1px solid #f3f4f6;
+    }
+    .candidature-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .candidature-header h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .candidature-count {
+      background: #3b82f6;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .candidature-count.zero {
+      background: #e5e7eb;
+      color: #9ca3af;
+    }
+
+    .candidati-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .candidato-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: white;
+      border-radius: 50px;
+      border: 1.5px solid #e5e7eb;
+      font-size: 0.85rem;
+    }
+    .chip-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .chip-nome {
+      font-weight: 500;
+      color: #374151;
+    }
+    .chip-score {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .nessuna-candidatura {
+      text-align: center;
+      padding: 16px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .card-footer {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #f3f4f6;
+    }
+    .card-footer .azioni {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background: #f3f4f6;
+      color: #6b7280;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+    .btn-icon:hover {
+      background: #dbeafe;
+      color: #3b82f6;
+    }
+    .btn-icon.danger:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    .btn-icon.success:hover {
+      background: #d1fae5;
+      color: #059669;
+    }
+    .btn-text {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: #eff6ff;
+      color: #3b82f6;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-text:hover {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-text-outline {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #e5e7eb;
+      background: white;
+      color: #6b7280;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-text-outline:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 16px;
+      border: 2px dashed #e5e7eb;
+    }
+    .empty-state .emoji { font-size: 4rem; margin-bottom: 16px; }
+    .empty-state h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0 0 8px 0;
+    }
+    .empty-state p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin: 0 0 24px 0;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 0;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .modal-header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0 0 6px 0;
+    }
+    .modal-header p {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin: 0;
+    }
+    .modal-body {
+      padding: 24px 32px;
+      overflow-y: auto;
+      max-height: 60vh;
+    }
+    .modal-footer {
+      padding: 16px 32px 24px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    .form-group label .required { color: #dc2626; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .requisiti-section {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .requisiti-section h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e2a3a;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 8px;
+      border: 1.5px solid #e5e7eb;
+      cursor: pointer;
+    }
+    .checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #3b82f6;
+      cursor: pointer;
+    }
+    .checkbox-item label {
+      font-size: 0.9rem;
+      color: #374151;
+      cursor: pointer;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .btn-secondary {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1.5px solid #e5e7eb;
+      background: white;
+      color: #6b7280;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .confirm-overlay.active { display: flex; }
+    .confirm-box {
+      background: white;
+      border-radius: 16px;
+      padding: 28px 32px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .confirm-box .emoji { font-size: 3rem; margin-bottom: 12px; }
+    .confirm-box h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0 0 8px 0;
+    }
+    .confirm-box p {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin: 0 0 24px 0;
+    }
+    .confirm-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .confirm-actions .btn-secondary { flex: 1; }
+    .confirm-actions .btn-danger {
+      flex: 1;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      background: #dc2626;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .confirm-actions .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    @media (max-width: 768px) {
+      .proposte-grid { grid-template-columns: 1fr; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .form-row, .form-row-3 { grid-template-columns: 1fr; }
+      .checkbox-grid { grid-template-columns: 1fr; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .confirm-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../assets/logo.png" alt="SHIFT Manager" width="48" height="48" style="border-radius: 12px;" />
+      <h2>SHIFT Manager</h2>
+    </div>
+    <nav class="nav">
+      <a href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="lavoratori.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Trova personale
+      </a>
+      <a href="proposte.html" class="active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        Proposte di lavoro
+      </a>
+      <a href="candidature.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Candidature
+      </a>
+      <a href="comunicazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Comunicazioni
+      </a>
+      <a href="impostazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Impostazioni
+      </a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <h1>Proposte di lavoro</h1>
+      <div class="user-menu">
+        <span class="username">Mirko</span>
+        <svg width="32" height="32" viewBox="0 0 32 32" style="border-radius:50%">
+          <circle cx="16" cy="16" r="16" fill="#3b82f6"/>
+          <text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-weight="bold">M</text>
+        </svg>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1>Le tue proposte</h1>
+          <p>Gestisci i tuoi turni e trova il personale migliore</p>
+        </div>
+        <button class="btn-primary" onclick="apriModal()">
+          <span>+</span> Nuova proposta
+        </button>
+      </div>
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-mini">
+          <div class="stat-mini-icon blue">📋</div>
+          <div class="stat-mini-info">
+            <h4 id="statTotale">0</h4>
+            <p>Totali</p>
+          </div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-icon green">●</div>
+          <div class="stat-mini-info">
+            <h4 id="statAttive">0</h4>
+            <p>Attive</p>
+          </div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-icon purple">👥</div>
+          <div class="stat-mini-info">
+            <h4 id="statCandidature">0</h4>
+            <p>Candidature</p>
+          </div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-icon orange">✓</div>
+          <div class="stat-mini-info">
+            <h4 id="statCompletate">0</h4>
+            <p>Completate</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filtri-wrapper" id="filtriWrapper">
+        <button class="filtro-pill active" data-filtro="tutte" onclick="filtraProposte('tutte', this)">
+          Tutte <span class="filtro-count" id="countTutte">0</span>
+        </button>
+        <button class="filtro-pill" data-filtro="attiva" onclick="filtraProposte('attiva', this)">
+          Attive <span class="filtro-count" id="countAttive">0</span>
+        </button>
+        <button class="filtro-pill" data-filtro="completata" onclick="filtraProposte('completata', this)">
+          Completate <span class="filtro-count" id="countCompletate">0</span>
+        </button>
+        <button class="filtro-pill" data-filtro="scaduta" onclick="filtraProposte('scaduta', this)">
+          Scadute <span class="filtro-count" id="countScadute">0</span>
+        </button>
+      </div>
+
+      <div class="proposte-grid" id="proposteGrid"></div>
+
+      <div class="empty-state" id="emptyState">
+        <div class="emoji">📭</div>
+        <h3>Nessuna proposta</h3>
+        <p>Non hai ancora pubblicato nessuna proposta di lavoro.</p>
+        <button class="btn-primary" onclick="apriModal()">+ Crea la prima proposta</button>
+      </div>
+
+    </section>
+
+    <footer class="footer">SHIFT Manager © 2026</footer>
+  </div>
+
+  <div class="modal-overlay" id="modalNuovaProposta">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>📝 Nuova proposta</h2>
+        <p>Inserisci ruolo, orario, luogo e requisiti. Il sistema identifica i professionisti compatibili.</p>
+      </div>
+      <div class="modal-body">
+        <form id="formNuovaProposta" onsubmit="salvaProposta(event)">
+          <div class="form-group">
+            <label for="ruolo">Ruolo <span class="required">*</span></label>
+            <select id="ruolo" required>
+              <option value="">Seleziona ruolo</option>
+              <option value="aiuto_cuoco">🍳 Aiuto Cuoco</option>
+              <option value="cuoco">👨‍🍳 Cuoco</option>
+              <option value="pizzaiolo">🍕 Pizzaiolo</option>
+              <option value="barman">🍸 Barman</option>
+              <option value="cameriere">🍽️ Cameriere</option>
+              <option value="runner">🥂 Runner</option>
+              <option value="pulizie">🧹 Pulizie</option>
+              <option value="sommelier">🍷 Sommelier</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="data">Data <span class="required">*</span></label>
+              <input type="date" id="data" required />
+            </div>
+            <div class="form-group">
+              <label for="ora_inizio">Ora inizio <span class="required">*</span></label>
+              <input type="time" id="ora_inizio" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ora_fine">Ora fine <span class="required">*</span></label>
+              <input type="time" id="ora_fine" required />
+            </div>
+            <div class="form-group">
+              <label for="compenso">Compenso (€) <span class="required">*</span></label>
+              <input type="number" id="compenso" min="1" placeholder="Es. 50" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="luogo">Luogo / Struttura <span class="required">*</span></label>
+            <input type="text" id="luogo" placeholder="Es. Osteria da Gino, Roma" required />
+          </div>
+
+          <div class="form-group">
+            <label for="note">Descrizione turno</label>
+            <textarea id="note" placeholder="Descrivi il turno, requisiti specifici, uniforme..."></textarea>
+          </div>
+
+          <div class="requisiti-section">
+            <h4>🎯 Requisiti candidati</h4>
+            <div class="form-row-3">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="scoreMinimo">Shift Score min</label>
+                <select id="scoreMinimo">
+                  <option value="0">Nessuno</option>
+                  <option value="80">≥ 80</option>
+                  <option value="85">≥ 85</option>
+                  <option value="90">≥ 90</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="esperienzaMinima">Esperienza</label>
+                <select id="esperienzaMinima">
+                  <option value="0">Nessuna</option>
+                  <option value="6">6 mesi</option>
+                  <option value="12">1 anno</option>
+                  <option value="24">2 anni</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="distanzaMax">Distanza max</label>
+                <select id="distanzaMax">
+                  <option value="999">Illimitata</option>
+                  <option value="1">1 km</option>
+                  <option value="3">3 km</option>
+                  <option value="5">5 km</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-grid" style="margin-top: 14px;">
+              <div class="checkbox-item">
+                <input type="checkbox" id="reqHACCP" />
+                <label for="reqHACCP">HACCP</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="reqSicurezza" />
+                <label for="reqSicurezza">Sicurezza</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="reqAuto" />
+                <label for="reqAuto">Auto propria</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="reqInglese" />
+                <label for="reqInglese">Inglese</label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="chiudiModal()">Annulla</button>
+        <button type="button" class="btn-text-outline" onclick="salvaBozza()">💾 Salva bozza</button>
+        <button type="submit" class="btn-primary" form="formNuovaProposta">🚀 Pubblica</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" id="confirmDialog">
+    <div class="confirm-box">
+      <div class="emoji" id="confirmEmoji">⚠️</div>
+      <h3 id="confirmTitle">Conferma</h3>
+      <p id="confirmMessage">Sei sicuro?</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" onclick="annullaConferma()">Annulla</button>
+        <button class="btn-danger" id="confirmBtn" onclick="eseguiConferma()">Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const RUOLO_EMOJI = {
+      aiuto_cuoco: '🍳', cuoco: '👨‍🍳', pizzaiolo: '🍕', barman: '🍸',
+      cameriere: '🍽️', runner: '🥂', pulizie: '🧹', sommelier: '🍷'
+    };
+    const RUOLO_NOME = {
+      aiuto_cuoco: 'Aiuto cuoco', cuoco: 'Cuoco', pizzaiolo: 'Pizzaiolo',
+      barman: 'Barman', cameriere: 'Cameriere', runner: 'Runner',
+      pulizie: 'Pulizie', sommelier: 'Sommelier'
+    };
+    const RUOLO_COLORE = {
+      aiuto_cuoco: 'blue', cuoco: 'blue', pizzaiolo: 'orange',
+      barman: 'purple', cameriere: 'green', runner: 'green',
+      pulizie: 'purple', sommelier: 'purple'
+    };
+
+    let proposte = [
+      {
+        id: 'cameriere-001',
+        ruolo: 'cameriere',
+        data: '2026-06-25',
+        dataLabel: 'Gio 25 Giu',
+        orario: '18:00–23:00',
+        compenso: '60€',
+        luogo: 'Ristorante La Pergola, Roma',
+        stato: 'attiva',
+        candidature: [
+          { nome: 'Marco Bianchi', avatar: 'MB', score: 94 },
+          { nome: 'Sofia Russo', avatar: 'SR', score: 91 }
+        ],
+        note: 'Servizio serata, esperienza in ristorante stellato richiesta.',
+        requisiti: {
+          scoreMinimo: '85',
+          esperienzaMinima: '12',
+          distanzaMax: '5',
+          haccp: true,
+          sicurezza: false,
+          auto: false,
+          inglese: true
+        }
+      }
+    ];
+
+    let confirmCallback = null;
+
+    function getStatoEffettivo(p) {
+      if (p.stato === 'completata') return 'completata';
+      const oggi = new Date();
+      oggi.setHours(0, 0, 0, 0);
+      const d = new Date(p.data + 'T00:00:00');
+      if (d < oggi && p.stato === 'attiva') return 'scaduta';
+      return p.stato;
+    }
+
+    function renderTutto() {
+      const filtroAttivo = document.querySelector('.filtro-pill.active')?.dataset.filtro || 'tutte';
+      aggiornaStats();
+      renderProposte(filtroAttivo);
+      aggiornaFiltri();
+    }
+
+    function aggiornaStats() {
+      const totali = proposte.length;
+      const attive = proposte.filter(p => getStatoEffettivo(p) === 'attiva').length;
+      const completate = proposte.filter(p => getStatoEffettivo(p) === 'completata').length;
+      const scadute = proposte.filter(p => getStatoEffettivo(p) === 'scaduta').length;
+      const candidature = proposte.reduce((sum, p) => sum + (p.candidature?.length || 0), 0);
+
+      document.getElementById('statTotale').textContent = totali;
+      document.getElementById('statAttive').textContent = attive;
+      document.getElementById('statCompletate').textContent = completate + scadute;
+      document.getElementById('statCandidature').textContent = candidature;
+    }
+
+    function aggiornaFiltri() {
+      document.getElementById('countTutte').textContent = proposte.length;
+      document.getElementById('countAttive').textContent = proposte.filter(p => getStatoEffettivo(p) === 'attiva').length;
+      document.getElementById('countCompletate').textContent = proposte.filter(p => getStatoEffettivo(p) === 'completata').length;
+      document.getElementById('countScadute').textContent = proposte.filter(p => getStatoEffettivo(p) === 'scaduta').length;
+    }
+
+    function renderProposte(filtro) {
+      const grid = document.getElementById('proposteGrid');
+      const empty = document.getElementById('emptyState');
+
+      let filtrate = proposte;
+      if (filtro !== 'tutte') {
+        filtrate = proposte.filter(p => getStatoEffettivo(p) === filtro);
+      }
+
+      if (filtrate.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      grid.innerHTML = filtrate.map(p => creaCard(p)).join('');
+    }
+
+    function creaCard(p) {
+      const stato = getStatoEffettivo(p);
+      const colore = RUOLO_COLORE[p.ruolo] || 'blue';
+      const emoji = RUOLO_EMOJI[p.ruolo] || '📋';
+      const nomeRuolo = RUOLO_NOME[p.ruolo] || p.ruolo;
+      const numCandidature = p.candidature?.length || 0;
+
+      const statoClass = stato === 'attiva' ? 'stato-attiva' : stato === 'completata' ? 'stato-completata' : 'stato-scaduta';
+      const statoLabel = stato === 'attiva' ? 'Attiva' : stato === 'completata' ? 'Completata' : 'Scaduta';
+
+      let azioniHTML = '';
+      if (stato === 'attiva') {
+        azioniHTML = `
+          <button class="btn-icon success" title="Segna come completata" onclick="event.stopPropagation(); completaProposta('${p.id}')">✓</button>
+          <button class="btn-icon" title="Modifica" onclick="event.stopPropagation(); modificaProposta('${p.id}')">✏️</button>
+          <button class="btn-icon" title="Duplica" onclick="event.stopPropagation(); duplicaProposta('${p.id}')">📋</button>
+          <button class="btn-icon danger" title="Elimina" onclick="event.stopPropagation(); eliminaProposta('${p.id}')">🗑️</button>`;
+      } else if (stato === 'completata') {
+        azioniHTML = `
+          <button class="btn-icon" title="Riattiva" onclick="event.stopPropagation(); riattivaProposta('${p.id}')">↩️</button>
+          <button class="btn-icon" title="Duplica" onclick="event.stopPropagation(); duplicaProposta('${p.id}')">📋</button>
+          <button class="btn-icon danger" title="Elimina" onclick="event.stopPropagation(); eliminaProposta('${p.id}')">🗑️</button>`;
+      } else {
+        azioniHTML = `
+          <button class="btn-icon" title="Riattiva" onclick="event.stopPropagation(); riattivaProposta('${p.id}')">↩️</button>
+          <button class="btn-icon" title="Duplica" onclick="event.stopPropagation(); duplicaProposta('${p.id}')">📋</button>
+          <button class="btn-icon danger" title="Elimina" onclick="event.stopPropagation(); eliminaProposta('${p.id}')">🗑️</button>`;
+      }
+
+      let candidatureHTML = '';
+      if (numCandidature > 0) {
+        candidatureHTML = `
+          <div class="candidature-header">
+            <h4>👥 Candidature</h4>
+            <span class="candidature-count">${numCandidature}</span>
+          </div>
+          <div class="candidati-row">
+            ${p.candidature.map(c => `
+              <div class="candidato-chip">
+                <div class="chip-avatar">${c.avatar}</div>
+                <span class="chip-nome">${c.nome}</span>
+                <span class="chip-score">${c.score}</span>
+              </div>
+            `).join('')}
+          </div>`;
+      } else if (stato === 'completata') {
+        candidatureHTML = `
+          <div class="candidature-header">
+            <h4>👥 Risultato</h4>
+            <span class="candidature-count" style="background: #10b981;">✓</span>
+          </div>
+          <div class="nessuna-candidatura" style="color: #059669; font-style: normal;">
+            Completata • ${p.assegnatoA ? 'Assegnato a ' + p.assegnatoA : 'Chiusa'}
+          </div>`;
+      } else {
+        candidatureHTML = `
+          <div class="candidature-header">
+            <h4>👥 Candidature</h4>
+            <span class="candidature-count zero">0</span>
+          </div>
+          <div class="nessuna-candidatura">Nessuna candidatura ancora</div>`;
+      }
+
+      return `
+        <div class="proposta-card" data-stato="${stato}" onclick="location.href='candidature.html?id=${p.id}'">
+          <div class="card-header ${colore}">
+            <div class="card-ruolo-row">
+              <div class="card-ruolo">
+                <span class="emoji">${emoji}</span>
+                <div>
+                  <h3>${nomeRuolo}</h3>
+                  <p>${p.luogo}</p>
+                </div>
+              </div>
+              <span class="card-stato ${statoClass}">${statoLabel}</span>
+            </div>
+          </div>
+          <div class="card-dettagli">
+            <span class="dettaglio-tag">📅 ${p.dataLabel}</span>
+            <span class="dettaglio-tag">🕐 ${p.orario}</span>
+            <span class="dettaglio-tag">💰 ${p.compenso}</span>
+          </div>
+          <div class="card-candidature">
+            ${candidatureHTML}
+          </div>
+          <div class="card-footer">
+            <div class="azioni">
+              ${azioniHTML}
+            </div>
+            <button class="btn-text">Gestisci →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function filtraProposte(filtro, btn) {
+      document.querySelectorAll('.filtro-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      btn.dataset.filtro = filtro;
+      renderTutto();
+    }
+
+    function apriModal() {
+      document.getElementById('modalNuovaProposta').classList.add('active');
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('data').setAttribute('min', today);
+      document.getElementById('data').value = today;
+    }
+
+    function chiudiModal() {
+      document.getElementById('modalNuovaProposta').classList.remove('active');
+      document.getElementById('formNuovaProposta').reset();
+    }
+
+    document.getElementById('modalNuovaProposta').addEventListener('click', function(e) {
+      if (e.target === this) chiudiModal();
+    });
+
+    function salvaBozza() {
+      const ruolo = document.getElementById('ruolo').value;
+      const data = document.getElementById('data').value;
+      const oraInizio = document.getElementById('ora_inizio').value;
+      const oraFine = document.getElementById('ora_fine').value;
+      const compenso = document.getElementById('compenso').value;
+      const luogo = document.getElementById('luogo').value;
+
+      if (!ruolo || !data || !oraInizio || !oraFine || !compenso || !luogo) {
+        mostraToast('⚠️ Compila tutti i campi obbligatori per salvare la bozza');
+        return;
+      }
+
+      const dataObj = new Date(data + 'T00:00:00');
+      const giorni = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+      const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+      const dataLabel = giorni[dataObj.getDay()] + ' ' + dataObj.getDate() + ' ' + mesi[dataObj.getMonth()];
+
+      const bozza = {
+        id: 'bozza-' + Date.now(),
+        ruolo: ruolo,
+        data: data,
+        dataLabel: dataLabel,
+        orario: oraInizio + '–' + oraFine,
+        compenso: compenso + '€',
+        luogo: luogo,
+        stato: 'attiva',
+        candidature: [],
+        note: document.getElementById('note').value,
+        requisiti: {
+          scoreMinimo: document.getElementById('scoreMinimo').value,
+          esperienzaMinima: document.getElementById('esperienzaMinima').value,
+          distanzaMax: document.getElementById('distanzaMax').value,
+          haccp: document.getElementById('reqHACCP').checked,
+          sicurezza: document.getElementById('reqSicurezza').checked,
+          auto: document.getElementById('reqAuto').checked,
+          inglese: document.getElementById('reqInglese').checked
+        }
+      };
+
+      proposte.push(bozza);
+      chiudiModal();
+      renderTutto();
+      mostraToast('💾 Bozza salvata!');
+    }
+
+    function salvaProposta(e) {
+      e.preventDefault();
+
+      const ruolo = document.getElementById('ruolo').value;
+      const data = document.getElementById('data').value;
+      const oraInizio = document.getElementById('ora_inizio').value;
+      const oraFine = document.getElementById('ora_fine').value;
+      const compenso = document.getElementById('compenso').value;
+      const luogo = document.getElementById('luogo').value;
+
+      const dataObj = new Date(data + 'T00:00:00');
+      const giorni = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+      const mesi = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+      const dataLabel = giorni[dataObj.getDay()] + ' ' + dataObj.getDate() + ' ' + mesi[dataObj.getMonth()];
+
+      const nuovaProposta = {
+        id: ruolo + '-' + Date.now(),
+        ruolo: ruolo,
+        data: data,
+        dataLabel: dataLabel,
+        orario: oraInizio + '–' + oraFine,
+        compenso: compenso + '€',
+        luogo: luogo,
+        stato: 'attiva',
+        candidature: [],
+        note: document.getElementById('note').value,
+        requisiti: {
+          scoreMinimo: document.getElementById('scoreMinimo').value,
+          esperienzaMinima: document.getElementById('esperienzaMinima').value,
+          distanzaMax: document.getElementById('distanzaMax').value,
+          haccp: document.getElementById('reqHACCP').checked,
+          sicurezza: document.getElementById('reqSicurezza').checked,
+          auto: document.getElementById('reqAuto').checked,
+          inglese: document.getElementById('reqInglese').checked
+        }
+      };
+
+      proposte.push(nuovaProposta);
+      chiudiModal();
+      renderTutto();
+      mostraToast('✅ Proposta pubblicata!');
+    }
+
+    function completaProposta(id) {
+      const p = proposte.find(x => x.id === id);
+      if (!p) return;
+      mostraConferma(
+        '✅ Completa proposta',
+        'Vuoi segnare "' + (RUOLO_NOME[p.ruolo] || p.ruolo) + '" del ' + p.dataLabel + ' come completata? Non riceverà più candidature.',
+        () => {
+          p.stato = 'completata';
+          renderTutto();
+          mostraToast('✅ Proposta completata!');
+        }
+      );
+    }
+
+    function riattivaProposta(id) {
+      const p = proposte.find(x => x.id === id);
+      if (!p) return;
+
+      const oggi = new Date();
+      oggi.setHours(0, 0, 0, 0);
+      const dataProposta = new Date(p.data + 'T00:00:00');
+
+      if (dataProposta < oggi) {
+        mostraConferma(
+          '📅 Data scaduta',
+          'La data di questa proposta è nel passato. Vuoi aggiornarla a oggi e riattivarla?',
+          () => {
+            p.data = new Date().toISOString().split('T')[0];
+            p.dataLabel = 'Oggi';
+            p.stato = 'attiva';
+            renderTutto();
+            mostraToast('🔄 Proposta riattivata con data aggiornata!');
+          }
+        );
+      } else {
+        p.stato = 'attiva';
+        renderTutto();
+        mostraToast('🔄 Proposta riattivata!');
+      }
+    }
+
+    function modificaProposta(id) {
+      const p = proposte.find(x => x.id === id);
+      if (!p) return;
+      mostraToast('✏️ Modifica proposta: ' + (RUOLO_NOME[p.ruolo] || p.ruolo) + ' – ' + p.luogo);
+    }
+
+    function duplicaProposta(id) {
+      const originale = proposte.find(p => p.id === id);
+      if (!originale) return;
+
+      const duplicata = {
+        ...originale,
+        id: originale.ruolo + '-' + Date.now(),
+        stato: 'attiva',
+        candidature: [],
+        data: new Date().toISOString().split('T')[0],
+        dataLabel: 'Oggi'
+      };
+
+      proposte.push(duplicata);
+      renderTutto();
+      mostraToast('✅ Proposta duplicata!');
+    }
+
+    function eliminaProposta(id) {
+      const p = proposte.find(x => x.id === id);
+      if (!p) return;
+
+      mostraConferma(
+        '🗑️ Elimina proposta',
+        'Sei sicuro di voler eliminare "' + (RUOLO_NOME[p.ruolo] || p.ruolo) + '" del ' + p.dataLabel + '? Questa azione non può essere annullata.',
+        () => {
+          proposte = proposte.filter(x => x.id !== id);
+          renderTutto();
+          mostraToast('🗑️ Proposta eliminata');
+        }
+      );
+    }
+
+    function mostraConferma(titolo, messaggio, callback) {
+      confirmCallback = callback;
+      document.getElementById('confirmTitle').textContent = titolo;
+      document.getElementById('confirmMessage').textContent = messaggio;
+      document.getElementById('confirmDialog').classList.add('active');
+    }
+
+    function annullaConferma() {
+      confirmCallback = null;
+      document.getElementById('confirmDialog').classList.remove('active');
+    }
+
+    function eseguiConferma() {
+      if (confirmCallback) confirmCallback();
+      annullaConferma();
+    }
+
+    document.getElementById('confirmDialog').addEventListener('click', function(e) {
+      if (e.target === this) annullaConferma();
+    });
+
+    function mostraToast(messaggio) {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #1e2a3a;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        z-index: 9999;
+        animation: slideInToast 0.4s ease;
+      `;
+      toast.textContent = messaggio;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideOutToast 0.4s ease';
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideInToast {
+        from { transform: translateX(100px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOutToast {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100px); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    document.addEventListener('DOMContentLoaded', renderTutto);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trova personale – SHIFT Manager</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .lavoratori-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .lavoratori-header h1 { font-size: 24px; }
+
+    .filtri-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filtro-select {
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      color: #555;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .filtro-select:focus { outline: none; border-color: #3b82f6; }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .search-box input:focus { outline: none; border-color: #3b82f6; }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .reparti-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .reparto-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .reparto-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .reparto-card.active {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .reparto-card .emoji { font-size: 2.5rem; margin-bottom: 8px; }
+    .reparto-card h3 { font-size: 1rem; font-weight: 700; color: #1e2a3a; margin: 0; }
+    .reparto-card p { font-size: 0.8rem; color: #6b7280; margin: 4px 0 0 0; }
+
+    .lavoratori-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .lavoratori-table thead { background: #f8fafc; }
+    .lavoratori-table th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .lavoratori-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.9rem;
+      color: #374151;
+    }
+    .lavoratori-table tbody tr:hover { background: #f8fafc; }
+    .lavoratori-table tbody tr:last-child td { border-bottom: none; }
+
+    .lavoratore-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .lavoratore-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .lavoratore-nome { display: flex; align-items: center; gap: 6px; }
+    .lavoratore-nome h4 { font-size: 0.95rem; font-weight: 700; color: #1e2a3a; margin: 0; }
+    .btn-preferito {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 2px;
+      transition: transform 0.2s;
+      color: #d1d5db;
+    }
+    .btn-preferito:hover { transform: scale(1.2); }
+    .btn-preferito.attivo { color: #fbbf24; }
+    .lavoratore-nome p { font-size: 0.8rem; color: #6b7280; margin: 2px 0 0 0; }
+
+    .storico-info { display: flex; flex-direction: column; gap: 2px; }
+    .storico-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 600; }
+    .storico-si { color: #059669; }
+    .storico-no { color: #9ca3af; }
+    .storico-turni { font-size: 0.75rem; color: #6b7280; }
+    .ultimo-turno { font-size: 0.75rem; color: #6b7280; }
+    .ultimo-turno.recente { color: #059669; font-weight: 600; }
+
+    .shift-score-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .shift-score-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .score-starter { background: #f3f4f6; color: #6b7280; border: 2px solid #d1d5db; }
+    .score-professional { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: white; }
+    .score-elite { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; }
+    .score-premium { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+    .livello-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
+    }
+
+    .badge-ruolo {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .distanza {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+    .affidabilita {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+    }
+    .affidabilita-alta { color: #059669; }
+    .affidabilita-media { color: #d97706; }
+    .affidabilita-bassa { color: #dc2626; }
+
+    .btn-invita {
+      background: #3b82f6;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-invita:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn-chat-mini {
+      background: #f3f4f6;
+      color: #6b7280;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-left: 6px;
+    }
+    .btn-chat-mini:hover { background: #dbeafe; color: #1e40af; }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      width: 90%;
+      max-width: 450px;
+    }
+    .modal h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; color: #1e2a3a; }
+    .modal-lavoratore {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .modal-lavoratore .avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .modal-lavoratore h4 { font-size: 1rem; font-weight: 700; margin: 0; }
+    .modal-lavoratore p { font-size: 0.85rem; color: #6b7280; margin: 2px 0 0 0; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .form-group select, .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .form-group select:focus, .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .modal-azioni { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+    .btn-modal { padding: 10px 24px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .btn-annulla { background: #f3f4f6; color: #6b7280; }
+    .btn-invia { background: #3b82f6; color: white; }
+
+    @media (max-width: 768px) {
+      .reparti-grid { grid-template-columns: repeat(2, 1fr); }
+      .lavoratori-table { display: block; overflow-x: auto; }
+      .filtri-bar { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../assets/logo.png" alt="SHIFT Manager" width="48" height="48" style="border-radius: 12px;" />
+      <h2>SHIFT Manager</h2>
+    </div>
+    <nav class="nav">
+      <a href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="lavoratori.html" class="active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Lavoratori disponibili
+      </a>
+      <a href="proposte.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        Proposte di lavoro
+      </a>
+      <a href="candidature.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Candidature
+      </a>
+      <a href="comunicazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Comunicazioni
+      </a>
+      <a href="impostazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Impostazioni
+      </a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <h1>Trova personale</h1>
+      <div class="user-menu">
+        <span class="username">Mirko</span>
+        <svg width="32" height="32" viewBox="0 0 32 32" style="border-radius:50%">
+          <circle cx="16" cy="16" r="16" fill="#3b82f6"/>
+          <text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-weight="bold">M</text>
+        </svg>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <div class="reparti-grid">
+        <div class="reparto-card active" onclick="filtraReparto('tutti', this)">
+          <div class="emoji">🍽️</div>
+          <h3>Tutti</h3>
+          <p>8 lavoratori</p>
+        </div>
+        <div class="reparto-card" onclick="filtraReparto('cucina', this)">
+          <div class="emoji">🍳</div>
+          <h3>Cucina</h3>
+          <p>3 lavoratori</p>
+        </div>
+        <div class="reparto-card" onclick="filtraReparto('sala', this)">
+          <div class="emoji">🥂</div>
+          <h3>Sala</h3>
+          <p>3 lavoratori</p>
+        </div>
+        <div class="reparto-card" onclick="filtraReparto('extra', this)">
+          <div class="emoji">🧹</div>
+          <h3>Extra</h3>
+          <p>2 lavoratori</p>
+        </div>
+      </div>
+
+      <div class="filtri-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchLavoratori" placeholder="Cerca per nome o ruolo..." onkeyup="cercaLavoratori()">
+        </div>
+        <select class="filtro-select" id="filtroDistanza" onchange="filtraTabella()">
+          <option value="tutte">Qualsiasi distanza</option>
+          <option value="1">Entro 1 km</option>
+          <option value="3">Entro 3 km</option>
+          <option value="5">Entro 5 km</option>
+        </select>
+        <select class="filtro-select" id="filtroScore" onchange="filtraTabella()">
+          <option value="tutti">Qualsiasi livello</option>
+          <option value="premium">⭐ Premium (90-100)</option>
+          <option value="elite">🟣 Elite (75-89)</option>
+          <option value="professional">🔵 Professional (60-74)</option>
+        </select>
+        <select class="filtro-select" id="filtroStorico" onchange="filtraTabella()">
+          <option value="tutti">Tutti i lavoratori</option>
+          <option value="preferiti">⭐ Solo preferiti</option>
+          <option value="collaborato">✓ Già collaborato</option>
+          <option value="nuovi">✕ Mai collaborato</option>
+        </select>
+      </div>
+
+      <table class="lavoratori-table">
+        <thead>
+          <tr>
+            <th>Lavoratore</th>
+            <th>Ruolo</th>
+            <th>Shift Score</th>
+            <th>Storico</th>
+            <th>Distanza</th>
+            <th>Affidabilità</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="tabellaLavoratori">
+          <tr data-reparto="cucina" data-distanza="2" data-score="92" data-livello="premium" data-preferito="true" data-collaborato="true">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">MR</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Mario Rossi</h4>
+                    <button class="btn-preferito attivo" onclick="togglePreferito(this)" title="Rimuovi dai preferiti">⭐</button>
+                  </div>
+                  <p>Aiuto cuoco</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🍳 Cucina</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=mario-rossi" class="shift-score-btn score-premium">
+                <span>⭐ 92</span>
+                <span class="livello-label">Premium</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-si">✓ Già collaborato</span>
+                <span class="storico-turni">12 turni insieme</span>
+                <span class="ultimo-turno recente">🕐 Ultimo: 3 giorni fa</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 2 km</span></td>
+            <td><span class="affidabilita affidabilita-alta">● 98%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Mario Rossi', 'MR', 'Aiuto cuoco', 92)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_mario.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="cucina" data-distanza="5" data-score="88" data-livello="elite" data-preferito="false" data-collaborato="true">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">LF</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Luca Ferrini</h4>
+                    <button class="btn-preferito" onclick="togglePreferito(this)" title="Aggiungi ai preferiti">☆</button>
+                  </div>
+                  <p>Cuoco</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🍳 Cucina</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=luca-ferrini" class="shift-score-btn score-elite">
+                <span>🟣 88</span>
+                <span class="livello-label">Elite</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-si">✓ Già collaborato</span>
+                <span class="storico-turni">5 turni insieme</span>
+                <span class="ultimo-turno">🕐 Ultimo: 2 settimane fa</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 5 km</span></td>
+            <td><span class="affidabilita affidabilita-alta">● 95%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Luca Ferrini', 'LF', 'Cuoco', 88)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_luca.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="cucina" data-distanza="1" data-score="95" data-livello="premium" data-preferito="true" data-collaborato="true">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">SB</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Sara Bianchi</h4>
+                    <button class="btn-preferito attivo" onclick="togglePreferito(this)" title="Rimuovi dai preferiti">⭐</button>
+                  </div>
+                  <p>Pizzaiola</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🍳 Cucina</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=sara-bianchi" class="shift-score-btn score-premium">
+                <span>⭐ 95</span>
+                <span class="livello-label">Premium</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-si">✓ Già collaborato</span>
+                <span class="storico-turni">8 turni insieme</span>
+                <span class="ultimo-turno recente">🕐 Ultimo: ieri</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 1 km</span></td>
+            <td><span class="affidabilita affidabilita-alta">● 100%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Sara Bianchi', 'SB', 'Pizzaiola', 95)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_sara.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="sala" data-distanza="1.5" data-score="89" data-livello="elite" data-preferito="false" data-collaborato="true">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">AV</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Anna Verdi</h4>
+                    <button class="btn-preferito" onclick="togglePreferito(this)" title="Aggiungi ai preferiti">☆</button>
+                  </div>
+                  <p>Cameriera</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🥂 Sala</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=anna-verdi" class="shift-score-btn score-elite">
+                <span>🟣 89</span>
+                <span class="livello-label">Elite</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-si">✓ Già collaborato</span>
+                <span class="storico-turni">3 turni insieme</span>
+                <span class="ultimo-turno recente">🕐 Ultimo: 5 giorni fa</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 1.5 km</span></td>
+            <td><span class="affidabilita affidabilita-alta">● 96%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Anna Verdi', 'AV', 'Cameriera', 89)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_anna.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="sala" data-distanza="3" data-score="84" data-livello="professional" data-preferito="false" data-collaborato="false">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">GN</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Giulia Neri</h4>
+                    <button class="btn-preferito" onclick="togglePreferito(this)" title="Aggiungi ai preferiti">☆</button>
+                  </div>
+                  <p>Runner</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🥂 Sala</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=giulia-neri" class="shift-score-btn score-professional">
+                <span>🔵 84</span>
+                <span class="livello-label">Professional</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-no">✕ Mai collaborato</span>
+                <span class="storico-turni">Nuova in zona</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 3 km</span></td>
+            <td><span class="affidabilita affidabilita-media">● 90%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Giulia Neri', 'GN', 'Runner', 84)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_giulia.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="sala" data-distanza="4" data-score="91" data-livello="premium" data-preferito="true" data-collaborato="true">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">MR2</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Marco Rinaldi</h4>
+                    <button class="btn-preferito attivo" onclick="togglePreferito(this)" title="Rimuovi dai preferiti">⭐</button>
+                  </div>
+                  <p>Barman</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🥂 Sala</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=marco-rinaldi" class="shift-score-btn score-premium">
+                <span>⭐ 91</span>
+                <span class="livello-label">Premium</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-si">✓ Già collaborato</span>
+                <span class="storico-turni">15 turni insieme</span>
+                <span class="ultimo-turno">🕐 Ultimo: 1 settimana fa</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 4 km</span></td>
+            <td><span class="affidabilita affidabilita-alta">● 97%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Marco Rinaldi', 'MR2', 'Barman', 91)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_marco2.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="extra" data-distanza="3" data-score="85" data-livello="professional" data-preferito="false" data-collaborato="true">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">BR</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Bruno</h4>
+                    <button class="btn-preferito" onclick="togglePreferito(this)" title="Aggiungi ai preferiti">☆</button>
+                  </div>
+                  <p>Pulizie</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🧹 Extra</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=bruno" class="shift-score-btn score-professional">
+                <span>🔵 85</span>
+                <span class="livello-label">Professional</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-si">✓ Già collaborato</span>
+                <span class="storico-turni">20 turni insieme</span>
+                <span class="ultimo-turno recente">🕐 Ultimo: 2 giorni fa</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 3 km</span></td>
+            <td><span class="affidabilita affidabilita-alta">● 94%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Bruno', 'BR', 'Pulizie', 85)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_bruno.html'">💬</button>
+            </td>
+          </tr>
+          <tr data-reparto="extra" data-distanza="6" data-score="82" data-livello="professional" data-preferito="false" data-collaborato="false">
+            <td>
+              <div class="lavoratore-info">
+                <div class="lavoratore-avatar">PL</div>
+                <div>
+                  <div class="lavoratore-nome">
+                    <h4>Paolo Lotti</h4>
+                    <button class="btn-preferito" onclick="togglePreferito(this)" title="Aggiungi ai preferiti">☆</button>
+                  </div>
+                  <p>Lavapiatti</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge-ruolo">🧹 Extra</span></td>
+            <td>
+              <a href="profilo_lavoratore.html?id=paolo-lotti" class="shift-score-btn score-professional">
+                <span>🔵 82</span>
+                <span class="livello-label">Professional</span>
+              </a>
+            </td>
+            <td>
+              <div class="storico-info">
+                <span class="storico-badge storico-no">✕ Mai collaborato</span>
+                <span class="storico-turni">Nuovo in zona</span>
+              </div>
+            </td>
+            <td><span class="distanza">📍 6 km</span></td>
+            <td><span class="affidabilita affidabilita-media">● 88%</span></td>
+            <td>
+              <button class="btn-invita" onclick="apriModalInvita('Paolo Lotti', 'PL', 'Lavapiatti', 82)">Invita</button>
+              <button class="btn-chat-mini" onclick="location.href='chat_paolo.html'">💬</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </section>
+    <footer class="footer">SHIFT Manager © 2026</footer>
+  </div>
+
+  <div class="modal-overlay" id="modalInvita">
+    <div class="modal">
+      <h2>📨 Invita al turno</h2>
+      <div class="modal-lavoratore" id="modalLavoratore">
+        <div class="avatar" id="modalAvatar">MR</div>
+        <div>
+          <h4 id="modalNome">Mario Rossi</h4>
+          <p id="modalRuolo">Aiuto cuoco • Shift Score: <span id="modalScore">92</span></p>
+        </div>
+      </div>
+      <form id="formInvita" onsubmit="invitaLavoratore(event)">
+        <div class="form-group">
+          <label for="turnoProposta">Seleziona proposta</label>
+          <select id="turnoProposta" required>
+            <option value="">Scegli un turno...</option>
+            <option value="aiuto-cuoco-22">🍳 Aiuto Cuoco – Lun 22 Apr 10:00-15:00</option>
+            <option value="runner-23">🥂 Runner – Mar 23 Apr 19:00-23:00</option>
+            <option value="pulizie-24">🧹 Pulizie – Mer 24 Apr 17:00-21:00</option>
+            <option value="pizzaiolo-25">🍕 Pizzaiolo – Gio 25 Apr 18:00-23:00</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="messaggioInvito">Messaggio (opzionale)</label>
+          <input type="text" id="messaggioInvito" placeholder="Ciao, ti contatto per un turno..." />
+        </div>
+        <div class="modal-azioni">
+          <button type="button" class="btn-modal btn-annulla" onclick="chiudiModalInvita()">Annulla</button>
+          <button type="submit" class="btn-modal btn-invia">📨 Invita</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let lavoratoreCorrente = null;
+
+    function togglePreferito(btn) {
+      btn.classList.toggle('attivo');
+      const isAttivo = btn.classList.contains('attivo');
+      btn.innerHTML = isAttivo ? '⭐' : '☆';
+      btn.title = isAttivo ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti';
+      const row = btn.closest('tr');
+      row.setAttribute('data-preferito', isAttivo ? 'true' : 'false');
+      const nome = row.querySelector('.lavoratore-nome h4').textContent;
+      const preferiti = JSON.parse(localStorage.getItem('shift_preferiti') || '[]');
+      if (isAttivo) {
+        if (!preferiti.includes(nome)) preferiti.push(nome);
+      } else {
+        const idx = preferiti.indexOf(nome);
+        if (idx > -1) preferiti.splice(idx, 1);
+      }
+      localStorage.setItem('shift_preferiti', JSON.stringify(preferiti));
+      const affidEl = row.querySelector('.affidabilita');
+      if (affidEl) {
+        const baseText = affidEl.textContent;
+        const baseVal = parseInt(baseText.match(/\d+/)[0]);
+        const newVal = isAttivo ? Math.min(100, baseVal + 2) : baseVal;
+        affidEl.textContent = '● ' + newVal + '%';
+        affidEl.className = 'affidabilita ' + (newVal >= 95 ? 'affidabilita-alta' : newVal >= 90 ? 'affidabilita-media' : 'affidabilita-bassa');
+      }
+    }
+
+    function filtraReparto(reparto, card) {
+      document.querySelectorAll('.reparto-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const righe = document.querySelectorAll('#tabellaLavoratori tr');
+      righe.forEach(r => {
+        r.style.display = (reparto === 'tutti' || r.getAttribute('data-reparto') === reparto) ? '' : 'none';
+      });
+    }
+
+    function cercaLavoratori() {
+      const testo = document.getElementById('searchLavoratori').value.toLowerCase();
+      const righe = document.querySelectorAll('#tabellaLavoratori tr');
+      righe.forEach(r => {
+        const nome = r.querySelector('.lavoratore-nome h4').textContent.toLowerCase();
+        const ruolo = r.querySelector('.lavoratore-nome p').textContent.toLowerCase();
+        r.style.display = (nome.includes(testo) || ruolo.includes(testo)) ? '' : 'none';
+      });
+    }
+
+    function filtraTabella() {
+      const dist = document.getElementById('filtroDistanza').value;
+      const score = document.getElementById('filtroScore').value;
+      const storico = document.getElementById('filtroStorico').value;
+      const righe = document.querySelectorAll('#tabellaLavoratori tr');
+      righe.forEach(r => {
+        const rDist = parseFloat(r.getAttribute('data-distanza'));
+        const rLivello = r.getAttribute('data-livello');
+        const rPref = r.getAttribute('data-preferito') === 'true';
+        const rColl = r.getAttribute('data-collaborato') === 'true';
+        let mostra = true;
+        if (dist !== 'tutte' && rDist > parseFloat(dist)) mostra = false;
+        if (score !== 'tutti' && rLivello !== score) mostra = false;
+        if (storico === 'preferiti' && !rPref) mostra = false;
+        if (storico === 'collaborato' && !rColl) mostra = false;
+        if (storico === 'nuovi' && rColl) mostra = false;
+        r.style.display = mostra ? '' : 'none';
+      });
+    }
+
+    function apriModalInvita(nome, avatar, ruolo, score) {
+      lavoratoreCorrente = { nome, avatar, ruolo, score };
+      document.getElementById('modalAvatar').textContent = avatar;
+      document.getElementById('modalNome').textContent = nome;
+      document.getElementById('modalRuolo').innerHTML = ruolo + ' • Shift Score: <span id="modalScore">' + score + '</span>';
+      document.getElementById('modalInvita').classList.add('active');
+    }
+
+    function chiudiModalInvita() {
+      document.getElementById('modalInvita').classList.remove('active');
+      document.getElementById('formInvita').reset();
+    }
+
+    function invitaLavoratore(e) {
+      e.preventDefault();
+      const proposta = document.getElementById('turnoProposta').value;
+      const messaggio = document.getElementById('messaggioInvito').value;
+      if (!proposta) { alert('Seleziona una proposta di lavoro!'); return; }
+      alert('✅ Invito inviato a ' + lavoratoreCorrente.nome + '!\n\nProposta: ' + proposta + '\nMessaggio: ' + (messaggio || 'Nessun messaggio'));
+      chiudiModalInvita();
+    }
+
+    document.getElementById('modalInvita').addEventListener('click', function(e) {
+      if (e.target === this) chiudiModalInvita();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const preferiti = JSON.parse(localStorage.getItem('shift_preferiti') || '[]');
+      document.querySelectorAll('#tabellaLavoratori tr').forEach(r => {
+        const nome = r.querySelector('.lavoratore-nome h4').textContent;
+        if (preferiti.includes(nome)) {
+          const btn = r.querySelector('.btn-preferito');
+          btn.classList.add('attivo');
+          btn.innerHTML = '⭐';
+          btn.title = 'Rimuovi dai preferiti';
+          r.setAttribute('data-preferito', 'true');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHIFT Manager – Dashboard</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: all 0.35s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      border-color: #dbeafe;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 4px;
+    }
+    .stat-card.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .stat-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .stat-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .stat-card h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin: 0 0 8px 0;
+    }
+    .stat-card .numero {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0;
+    }
+    .stat-card .sub {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .column-section h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0 0 16px 0;
+    }
+    .panel {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #f3f4f6;
+      overflow: hidden;
+    }
+    .panel-content { padding: 4px 0; }
+
+    .message-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .message-row:last-child { border-bottom: none; }
+    .message-row:hover { background: #f8fafc; }
+    .msg-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .msg-avatar.orange {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+    .msg-info { flex: 1; min-width: 0; }
+    .msg-info h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e2a3a;
+      margin: 0;
+    }
+    .msg-info p {
+      font-size: 0.82rem;
+      color: #6b7280;
+      margin: 3px 0 0 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .msg-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .msg-badge.green { background: #d1fae5; color: #065f46; }
+    .msg-badge.yellow { background: #fef3c7; color: #92400e; }
+    .msg-time {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0 0 16px 0;
+    }
+    .proposte-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .proposta-card {
+      background: white;
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid #f3f4f6;
+      cursor: pointer;
+      transition: all 0.35s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .proposta-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      border-color: #dbeafe;
+    }
+    .card-header {
+      padding: 20px 24px 16px;
+      position: relative;
+    }
+    .card-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 4px;
+    }
+    .card-header.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .card-header.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .card-header.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .card-header .emoji { font-size: 2rem; margin-bottom: 8px; display: block; }
+    .card-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 0 0 4px 0;
+    }
+    .card-header p {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin: 0;
+    }
+    .card-body {
+      padding: 0 24px 16px;
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #4b5563;
+    }
+    .card-footer-dash {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #f3f4f6;
+    }
+    .candidati-avatars {
+      display: flex;
+      gap: 6px;
+    }
+    .mini-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .candidati-count {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .empty-dash {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      background: white;
+      border-radius: 16px;
+      border: 2px dashed #e5e7eb;
+    }
+
+    @media (max-width: 768px) {
+      .stats-bar { grid-template-columns: 1fr; }
+      .two-columns { grid-template-columns: 1fr; }
+      .proposte-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../assets/logo.png" alt="SHIFT Manager" width="48" height="48" style="border-radius: 12px;" />
+      <h2>SHIFT Manager</h2>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="lavoratori.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Trova personale
+      </a>
+      <a href="proposte.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        Proposte di lavoro
+      </a>
+      <a href="candidature.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Candidature
+      </a>
+      <a href="comunicazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        Comunicazioni
+      </a>
+      <a href="impostazioni.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Impostazioni
+      </a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <h1>Dashboard</h1>
+      <div class="user-menu">
+        <span class="username">Mirko</span>
+        <svg width="32" height="32" viewBox="0 0 32 32" style="border-radius:50%">
+          <circle cx="16" cy="16" r="16" fill="#3b82f6"/>
+          <text x="16" y="21" text-anchor="middle" fill="white" font-size="14" font-weight="bold">M</text>
+        </svg>
+      </div>
+    </header>
+
+    <section class="content">
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-card blue" onclick="location.href='proposte.html'">
+          <h3>Proposte attive</h3>
+          <p class="numero" id="statProposte">0</p>
+          <p class="sub" id="subProposte">—</p>
+        </div>
+        <div class="stat-card green" onclick="location.href='candidature.html?id=cameriere-001'">
+          <h3>Candidature ricevute</h3>
+          <p class="numero" id="statCandidature">0</p>
+          <p class="sub" id="subCandidature">—</p>
+        </div>
+        <div class="stat-card purple" onclick="location.href='impostazioni.html'">
+          <h3>Turni completati</h3>
+          <p class="numero" id="statCompletati">0</p>
+          <p class="sub" id="subCompletati">—</p>
+        </div>
+      </div>
+
+      <div class="two-columns">
+
+        <div class="column-section">
+          <h2>Prossimi turni</h2>
+          <div class="panel">
+            <div class="panel-content" id="prossimiTurni"></div>
+          </div>
+        </div>
+
+        <div class="column-section">
+          <h2>Ultime comunicazioni</h2>
+          <div class="panel">
+            <div class="panel-content" id="ultimeComunicazioni">
+              <div class="message-row" onclick="location.href='comunicazioni.html'">
+                <div class="msg-avatar">MB</div>
+                <div class="msg-info">
+                  <h3>Marco Bianchi</h3>
+                  <p>Confermo disponibilità per il turno del 25</p>
+                  <span class="msg-time">Oggi, 09:14</span>
+                </div>
+              </div>
+              <div class="message-row" onclick="location.href='comunicazioni.html'">
+                <div class="msg-avatar">SR</div>
+                <div class="msg-info">
+                  <h3>Sofia Russo</h3>
+                  <p>Ho una domanda sulla location...</p>
+                  <span class="msg-time">Ieri, 18:32</span>
+                </div>
+              </div>
+              <div class="message-row" onclick="location.href='comunicazioni.html'">
+                <div class="msg-avatar orange">🔔</div>
+                <div class="msg-info">
+                  <h3>Sistema</h3>
+                  <p>Nuova candidatura ricevuta per Cameriere</p>
+                  <span class="msg-time">2 giorni fa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 class="section-title">Proposte in evidenza</h2>
+      <div class="proposte-grid" id="proposteEvidenza"></div>
+
+    </section>
+
+    <footer class="footer">SHIFT Manager © 2026</footer>
+  </div>
+
+  <script>
+    const PROPOSTE = [
+      {
+        id: 'cameriere-001',
+        ruolo: 'cameriere',
+        data: '2026-06-25',
+        dataLabel: 'Gio 25 Giu',
+        orario: '18:00–23:00',
+        compenso: '60€',
+        luogo: 'Ristorante La Pergola, Roma',
+        stato: 'attiva',
+        candidature: [
+          { nome: 'Marco Bianchi', avatar: 'MB', score: 94 },
+          { nome: 'Sofia Russo', avatar: 'SR', score: 91 }
+        ]
+      }
+    ];
+
+    const RUOLO_EMOJI = {
+      aiuto_cuoco: '🍳', cuoco: '👨‍🍳', pizzaiolo: '🍕', barman: '🍸',
+      cameriere: '🍽️', runner: '🥂', pulizie: '🧹', sommelier: '🍷'
+    };
+    const RUOLO_NOME = {
+      aiuto_cuoco: 'Aiuto cuoco', cuoco: 'Cuoco', pizzaiolo: 'Pizzaiolo',
+      barman: 'Barman', cameriere: 'Cameriere', runner: 'Runner',
+      pulizie: 'Pulizie', sommelier: 'Sommelier'
+    };
+
+    function getStatoEffettivo(p) {
+      if (p.stato === 'completata') return 'completata';
+      const oggi = new Date();
+      oggi.setHours(0, 0, 0, 0);
+      const d = new Date(p.data + 'T00:00:00');
+      if (d < oggi && p.stato === 'attiva') return 'scaduta';
+      return p.stato;
+    }
+
+    function renderDashboard() {
+      const attive = PROPOSTE.filter(p => getStatoEffettivo(p) === 'attiva');
+      const candidatureTotali = PROPOSTE.reduce((sum, p) => sum + (p.candidature?.length || 0), 0);
+      const completate = PROPOSTE.filter(p => getStatoEffettivo(p) === 'completata').length;
+
+      document.getElementById('statProposte').textContent = attive.length;
+      document.getElementById('subProposte').textContent = attive.length === 1 ? '1 proposta attiva' : attive.length + ' proposte attive';
+      document.getElementById('statCandidature').textContent = candidatureTotali;
+      document.getElementById('subCandidature').textContent = candidatureTotali === 1 ? '1 candidatura' : candidatureTotali + ' candidature';
+      document.getElementById('statCompletati').textContent = completate;
+      document.getElementById('subCompletati').textContent = completate === 1 ? '1 turno completato' : completate + ' turni completati';
+
+      const turniContainer = document.getElementById('prossimiTurni');
+      const prossimi = attive.slice().sort((a, b) => new Date(a.data) - new Date(b.data)).slice(0, 3);
+
+      if (prossimi.length === 0) {
+        turniContainer.innerHTML = '<div class="empty-dash">Nessun turno in programma</div>';
+      } else {
+        turniContainer.innerHTML = prossimi.map(p => {
+          const emoji = RUOLO_EMOJI[p.ruolo] || '📋';
+          const nomeRuolo = RUOLO_NOME[p.ruolo] || p.ruolo;
+          const numCand = p.candidature?.length || 0;
+
+          return `
+            <div class="message-row" onclick="location.href='candidature.html?id=${p.id}'">
+              <div class="msg-avatar">${emoji}</div>
+              <div class="msg-info">
+                <h3>${nomeRuolo} — ${p.luogo}</h3>
+                <p>${p.dataLabel} • ${p.orario} • ${p.compenso}</p>
+                ${numCand > 0
+                  ? `<span class="msg-badge green">${numCand} candidat${numCand === 1 ? 'a' : 'e'}</span>`
+                  : `<span class="msg-badge yellow">In attesa</span>`
+                }
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const evidenzaContainer = document.getElementById('proposteEvidenza');
+      const inEvidenza = attive.slice(0, 2);
+      const colori = ['blue', 'green'];
+
+      if (inEvidenza.length === 0) {
+        evidenzaContainer.innerHTML = '<div class="empty-dash">Nessuna proposta attiva</div>';
+      } else {
+        evidenzaContainer.innerHTML = inEvidenza.map((p, i) => {
+          const emoji = RUOLO_EMOJI[p.ruolo] || '📋';
+          const nomeRuolo = RUOLO_NOME[p.ruolo] || p.ruolo;
+          const numCand = p.candidature?.length || 0;
+          const avatars = (p.candidature || []).slice(0, 3).map(c =>
+            `<div class="mini-avatar">${c.avatar}</div>`
+          ).join('');
+
+          return `
+            <div class="proposta-card" onclick="location.href='candidature.html?id=${p.id}'">
+              <div class="card-header ${colori[i % 2]}">
+                <span class="emoji">${emoji}</span>
+                <h3>${nomeRuolo}</h3>
+                <p>${p.luogo}</p>
+              </div>
+              <div class="card-body">
+                <div class="card-tags">
+                  <span class="tag">📅 ${p.dataLabel}</span>
+                  <span class="tag">🕐 ${p.orario}</span>
+                  <span class="tag">💰 ${p.compenso}</span>
+                </div>
+              </div>
+              <div class="card-footer-dash">
+                <div class="candidati-avatars">
+                  ${avatars}
+                </div>
+                <span class="candidati-count">${numCand} candidat${numCand === 1 ? 'a' : 'e'}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderDashboard);
+  </script>
+
+</body>
+</html>

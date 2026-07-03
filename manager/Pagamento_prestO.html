@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pagamento PrestO - SHIFT Manager</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../assets/logo.png" alt="Logo" />
+      <h2>SHIFT Manager</h2>
+    </div>
+
+    <nav class="nav">
+      <a href="../index.html"><img src="../icons/home.svg" /> Dashboard</a>
+      <a href="lavoratori.html"><img src="../icons/users.svg" /> Trova personale</a>
+      <a href="proposte.html"><img src="../icons/proposte.svg" /> Proposte di lavoro</a>
+      <a href="comunicazioni.html"><img src="../icons/mail.svg" /> Comunicazioni</a>
+      <a href="pagamento_presto.html" class="active"><img src="../icons/euro.svg" /> Pagamento PrestO</a>
+      <a href="impostazioni.html"><img src="../icons/settings.svg" /> Impostazioni</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+
+    <header class="header">
+      <h1>Pagamento PrestO</h1>
+      <div class="user-menu">
+        <span class="username">Mirko</span>
+        <img src="../assets/user.png" alt="User Icon" />
+      </div>
+    </header>
+
+    <section class="content">
+
+      <h2 style="margin-bottom: 20px;">Turni da pagare</h2>
+
+      <div class="message-list">
+
+        <div class="message-card blue">
+          <img src="../assets/mario.svg" class="message-avatar" />
+          <div class="message-info">
+            <h3>Mario Rossi – Aiuto cuoco</h3>
+            <p>Mercoledì 10:00–15:00 • 5h • 50€</p>
+            <span class="timestamp">Stato: Da pagare</span>
+          </div>
+          <button class="primary small">Genera voucher</button>
+        </div>
+
+        <div class="message-card green">
+          <img src="../assets/anna.svg" class="message-avatar" />
+          <div class="message-info">
+            <h3>Anna Verdi – Runner</h3>
+            <p>Giovedì 19:00–23:00 • 4h • 40€</p>
+            <span class="timestamp">Stato: Voucher generato</span>
+          </div>
+          <button class="primary small">Scarica ricevuta</button>
+        </div>
+
+        <div class="message-card purple">
+          <img src="../assets/bruno.svg" class="message-avatar" />
+          <div class="message-info">
+            <h3>Bruno – Pulizie</h3>
+            <p>Venerdì 17:00–21:00 • 4h • 40€</p>
+            <span class="timestamp">Stato: Pagato</span>
+          </div>
+          <div class="message-arrow">✓</div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">SHIFT Manager © 2026</footer>
+
+  </div>
+
+</body>
+</html>
